@@ -15,21 +15,31 @@ class LAN:
       self.passwordXpath = '//*[@id=\"loginbox\"]/table/tbody/tr[3]/td[2]/input'
       self.submit_buttonXpath = '//*[@id=\"loginbox\"]/table/tbody/tr[5]/td/center/input'
 
+      self.chromedriver_path = 'chromedriver/chromedriver.exe'
+      self.browser_details_path = 'config/browser_details.yml'
+      self.login_details_path = 'config/login_details.yml'
+
       self.username, self.password = self.getLoginDetails()
-      self.browser_path = self.getBrowserPath()
       self.driver = self.getWebDriver()
 
    def getLoginDetails(self):
-      conf = yaml.load(open('config/login_details.yml'), Loader = yaml.BaseLoader)
+      conf = yaml.load(open(self.login_details_path), Loader = yaml.BaseLoader)
       username = conf['lanUser']['collegeId']
       password = conf['lanUser']['password']
 
       return (username, password)
 
+   def getWebDriver(self):
+      
+      option = webdriver.ChromeOptions()
+      option.binary_location = self.getBrowserPath()
+      # option.add_argument("--incognito") OPTIONAL
+      # option.add_argument("--headless") OPTIONAL
+
+      return (webdriver.Chrome(executable_path = self.chromedriver_path, options = option))
+
    def getBrowserPath(self):
-      browser_details = yaml.load(open('config/browser_details.yml'), Loader = yaml.BaseLoader)
-      browser_name = (browser_details['browser']['name']).lower()
-      browser_arch = (browser_details['browser']['arch']).lower()
+      browser_path = 'C:/Program Files{}/{}/Application/{}.exe'
 
       browser_folder = {
          'chrome': 'Google/Chrome',
@@ -42,24 +52,17 @@ class LAN:
          'x86': ' (x86)'
       }
 
+      browser_details = yaml.load(open(self.browser_details_path), Loader = yaml.BaseLoader)
+      browser_name = (browser_details['browser']['name']).lower()
+      browser_arch = (browser_details['browser']['arch']).lower()
+
       if browser_name not in browser_folder:
          raise Exception('Invalid browser name!')
 
       if browser_arch not in browser_arch_folder:
          raise Exception('Invalid browser architecture!')
 
-      browser_path = 'C:/Program Files{}/{}/Application/{}.exe'.format(browser_arch_folder.get(browser_arch),  browser_folder.get(browser_name), browser_name) 
-
-      return (browser_path)
-
-   def getWebDriver(self):
-      chromedriver_path = 'chromedriver/chromedriver.exe'
-      option = webdriver.ChromeOptions()
-      option.binary_location = self.getBrowserPath()
-      # option.add_argument("--incognito") OPTIONAL
-      # option.add_argument("--headless") OPTIONAL
-
-      return (webdriver.Chrome(executable_path = chromedriver_path, options = option))
+      return (browser_path.format(browser_arch_folder.get(browser_arch),  browser_folder.get(browser_name), browser_name))
 
    def login(self):
       try:
