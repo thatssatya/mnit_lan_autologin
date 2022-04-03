@@ -1,63 +1,79 @@
 from selenium import webdriver
 import yaml
 import sys
+import os
 
-def getLoginDetails():
-   conf = yaml.load(open('config/login_details.yml'))
-   username = conf['lanUser']['collegeId']
-   password = conf['lanUser']['password']
+# lan_login_root = os.environ['LAN_LOGIN_ROOT']
 
-   return username, password
+class LAN:
 
-def getBrowserPath():
-   browser_details = yaml.load(open('config/browser_details.yml'))
-   browser_name = (browser_details['browser']['name']).lower()
-   browser_arch = (browser_details['browser']['arch']).lower()
+   def __init__(self):
 
-   if not ((browser_name == 'chrome' or browser_name == 'msedge' or browser_name == 'brave') and (browser_arch == 'x64' or browser_arch == 'x86')):
-      print('Invalid browser details!')
-      sys.exit()
+      # self.loginSiteUrl = 'http://172.16.1.3:8002/index.php?zone=mnit'
+      self.loginSiteUrl = 'http://mnit.ac.in'
+      self.usernameXpath = '//*[@id=\"loginbox\"]/table/tbody/tr[2]/td[2]/input'
+      self.passwordXpath = '//*[@id=\"loginbox\"]/table/tbody/tr[3]/td[2]/input'
+      self.submit_buttonXpath = '//*[@id=\"loginbox\"]/table/tbody/tr[5]/td/center/input'
 
-   arch = ''
-   browser_folder = ''
+      self.username, self.password = self.getLoginDetails()
+      self.browser_path = self.getBrowserPath()
+      self.driver = self.getWebDriver()
 
-   if browser_arch == 'x86':
-      arch = ' (x86)'
-   if browser_name == 'chrome':
-      browser_folder = 'Google/Chrome'
-   elif browser_name == 'msedge':
-      browser_folder = 'Microsoft/Edge'
-   elif browser_name == 'brave':
-      browser_folder = 'BraveSoftware/Brave-Browser'
+   def getLoginDetails(self):
+      conf = yaml.load(open('config/login_details.yml'), Loader = yaml.BaseLoader)
+      username = conf['lanUser']['collegeId']
+      password = conf['lanUser']['password']
 
-   browser_path = 'C:/Program Files' + arch + '/' + browser_folder + '/Application/' + browser_name + '.exe'
+      return (username, password)
 
-   return browser_path
+   def getBrowserPath(self):
+      browser_details = yaml.load(open('config/browser_details.yml'), Loader = yaml.BaseLoader)
+      browser_name = (browser_details['browser']['name']).lower()
+      browser_arch = (browser_details['browser']['arch']).lower()
 
-def getWebDriver():
-   chromedriver_path = 'chromedriver/chromedriver.exe'
-   option = webdriver.ChromeOptions()
-   option.binary_location = getBrowserPath()
-   # option.add_argument("--incognito") OPTIONAL
-   # option.add_argument("--headless") OPTIONAL
+      browser_folder = {
+         'chrome': 'Google/Chrome',
+         'msedge': 'Microsoft/Edge',
+         'brave': 'BraveSoftware/Brave-Browser'
+      }
 
-   return webdriver.Chrome(executable_path = chromedriver_path, options = option)
+      browser_arch_folder = {
+         'x64': '',
+         'x86': ' (x86)'
+      }
 
-def login(url, usernameXpath, username, passwordXpath, password, submit_buttonXpath):
-   driver = getWebDriver()
+      if browser_name not in browser_folder:
+         raise Exception('Invalid browser name!')
 
-   driver.get(url)
-   driver.find_element_by_xpath(usernameXpath).send_keys(username)
-   driver.find_element_by_xpath(passwordXpath).send_keys(password)
-   driver.find_element_by_xpath(submit_buttonXpath).click()
+      if browser_arch not in browser_arch_folder:
+         raise Exception('Invalid browser architecture!')
+
+      browser_path = 'C:/Program Files{}/{}/Application/{}.exe'.format(browser_arch_folder.get(browser_arch),  browser_folder.get(browser_name), browser_name) 
+
+      return (browser_path)
+
+   def getWebDriver(self):
+      chromedriver_path = 'chromedriver/chromedriver.exe'
+      option = webdriver.ChromeOptions()
+      option.binary_location = self.getBrowserPath()
+      # option.add_argument("--incognito") OPTIONAL
+      # option.add_argument("--headless") OPTIONAL
+
+      return (webdriver.Chrome(executable_path = chromedriver_path, options = option))
+
+   def login(self):
+      try:
+         self.driver.get(self.loginSiteUrl)
+
+         self.driver.find_element_by_xpath(self.usernameXpath).send_keys(self.username)
+         self.driver.find_element_by_xpath(self.passwordXpath).send_keys(self.password)
+
+         self.driver.find_element_by_xpath(self.submit_buttonXpath).click()
+      
+      except Exception as e:
+         print(e)
+         self.driver.quit()
 
 if __name__ == '__main__':
-   loginSiteUrl = 'http://172.16.1.3:8002/index.php?zone=mnit'
-   # loginSiteUrl = 'https://cb.run/ILyB'
-   usernameXpath = '//*[@id=\"loginbox\"]/table/tbody/tr[2]/td[2]/input'
-   passwordXpath = '//*[@id=\"loginbox\"]/table/tbody/tr[3]/td[2]/input'
-   submit_buttonXpath = '//*[@id=\"loginbox\"]/table/tbody/tr[5]/td/center/input'
 
-   username, password = getLoginDetails()
-
-   login(loginSiteUrl, usernameXpath, username, passwordXpath, password, submit_buttonXpath)
+   LAN().login()
