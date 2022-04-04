@@ -4,7 +4,7 @@ import pkg_resources
 # from pkg_resources import DistributionNotFound, VersionConflict
 
 def install_required_packages():
-    required  = {'selenium', 'webdriver_manager'} 
+    required  = {'selenium', 'webdriver_manager', 'winshell'} 
     installed = {pkg.key for pkg in pkg_resources.working_set}
     missing = required - installed
 
