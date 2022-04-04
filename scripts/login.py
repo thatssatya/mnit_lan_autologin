@@ -1,9 +1,10 @@
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 import yaml
-import sys
 import os
-
-# lan_login_root = os.environ['LAN_LOGIN_ROOT']
+import re
 
 class LAN:
 
@@ -15,9 +16,17 @@ class LAN:
       self.passwordXpath = '//*[@id=\"loginbox\"]/table/tbody/tr[3]/td[2]/input'
       self.submit_buttonXpath = '//*[@id=\"loginbox\"]/table/tbody/tr[5]/td/center/input'
 
-      self.chromedriver_path = 'chromedriver/chromedriver.exe'
-      self.browser_details_path = 'config/browser_details.yml'
-      self.login_details_path = 'config/login_details.yml'
+      root = os.path.join(os.path.abspath(__file__), os.pardir, os.pardir)
+      # driver_root = os.path.join(root, 'chromedriver')
+      # regex = re.compile('^chromedriver')
+      
+      # for r, dirs, files in os.walk(driver_root):
+      #    for file in files:
+      #       if regex.match(file):
+      #          self.chromedriver_path = os.path.join(driver_root, file)
+
+      self.browser_details_path = os.path.join(root, r'config\browser_details.yml')
+      self.login_details_path = os.path.join(root, r'config\login_details.yml')
 
       self.username, self.password = self.getLoginDetails()
       self.driver = self.getWebDriver()
@@ -30,21 +39,21 @@ class LAN:
       return (username, password)
 
    def getWebDriver(self):
-      
       option = webdriver.ChromeOptions()
       option.binary_location = self.getBrowserPath()
-      # option.add_argument("--incognito") OPTIONAL
-      # option.add_argument("--headless") OPTIONAL
+      # option.add_argument("--incognito")
+      option.add_argument("--headless")
+      option.add_experimental_option("excludeSwitches", ["enable-logging"])
 
-      return (webdriver.Chrome(executable_path = self.chromedriver_path, options = option))
+      return (webdriver.Chrome(service = Service(ChromeDriverManager().install()), options = option))
 
    def getBrowserPath(self):
-      browser_path = 'C:/Program Files{}/{}/Application/{}.exe'
+      browser_path = r'C:\Program Files{}\{}\Application\{}.exe'
 
       browser_folder = {
-         'chrome': 'Google/Chrome',
-         'msedge': 'Microsoft/Edge',
-         'brave': 'BraveSoftware/Brave-Browser'
+         'chrome': r'Google\Chrome',
+         'msedge': r'Microsof\Edge',
+         'brave': r'BraveSoftware\Brave-Browser'
       }
 
       browser_arch_folder = {
@@ -68,15 +77,14 @@ class LAN:
       try:
          self.driver.get(self.loginSiteUrl)
 
-         self.driver.find_element_by_xpath(self.usernameXpath).send_keys(self.username)
-         self.driver.find_element_by_xpath(self.passwordXpath).send_keys(self.password)
+         self.driver.find_element(by = By.XPATH, value = self.usernameXpath).send_keys(self.username)
+         self.driver.find_element(by = By.XPATH, value = self.passwordXpath).send_keys(self.password)
+         self.driver.find_element(by = By.XPATH, value = self.submit_buttonXpath).click()
 
-         self.driver.find_element_by_xpath(self.submit_buttonXpath).click()
-      
       except Exception as e:
-         print(e)
          self.driver.quit()
 
 if __name__ == '__main__':
-
+   print('Logging into LAN...')
    LAN().login()
+   print('Done!')
