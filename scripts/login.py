@@ -4,7 +4,6 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 import yaml
 import os
-import re
 
 class LAN:
 
@@ -17,13 +16,6 @@ class LAN:
       self.submit_buttonXpath = '//*[@id=\"loginbox\"]/table/tbody/tr[5]/td/center/input'
 
       root = os.path.join(os.path.abspath(__file__), os.pardir, os.pardir)
-      # driver_root = os.path.join(root, 'chromedriver')
-      # regex = re.compile('^chromedriver')
-      
-      # for r, dirs, files in os.walk(driver_root):
-      #    for file in files:
-      #       if regex.match(file):
-      #          self.chromedriver_path = os.path.join(driver_root, file)
 
       self.browser_details_path = os.path.join(root, r'config\browser_details.yml')
       self.login_details_path = os.path.join(root, r'config\login_details.yml')
@@ -39,9 +31,8 @@ class LAN:
       return (username, password)
 
    def getWebDriver(self):
-      option = webdriver.ChromeOptions()
+      option = Options()
       option.binary_location = self.getBrowserPath()
-      # option.add_argument("--incognito")
       option.add_argument("--headless")
       option.add_experimental_option("excludeSwitches", ["enable-logging"])
 

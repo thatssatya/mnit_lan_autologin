@@ -1,6 +1,6 @@
 browser:
   # Supported browsers: chrome, msedge, brave
-  name: "brave"
+  name: "chrome"
   
   # Supported architectures: x64, x86
   arch: "x64"

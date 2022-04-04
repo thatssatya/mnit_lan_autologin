@@ -1,49 +1,46 @@
 import sys
 import subprocess
 import pkg_resources
-from pkg_resources import DistributionNotFound, VersionConflict
+# from pkg_resources import DistributionNotFound, VersionConflict
 
-def should_install_requirement(requirement):
-    should_install = False
-    try:
-        pkg_resources.require(requirement)
-    except (DistributionNotFound, VersionConflict):
-        should_install = True
-    return should_install
+def install_required_packages():
+    required  = {'selenium', 'webdriver_manager'} 
+    installed = {pkg.key for pkg in pkg_resources.working_set}
+    missing = required - installed
+
+    if missing:
+        print('installing', missing)
+        subprocess.check_call([sys.executable, '-m', 'pip', 'install', *missing])
+
+if __name__ == '__main__':
+    install_required_packages()
+
+# def should_install_requirement(requirement):
+#     should_install = False
+#     try:
+#         pkg_resources.require(requirement)
+#     except (DistributionNotFound, VersionConflict):
+#         should_install = True
+#     return should_install
 
 
-def install_packages(requirement_list):
-    try:
-        requirements = [
-            requirement
-            for requirement in requirement_list
-            if should_install_requirement(requirement)
-        ]
-        if len(requirements) > 0:
-            subprocess.check_call([sys.executable, "-m", "pip", "install", *requirements])
-        else:
-            print("Requirements already satisfied.")
+# def install_packages(requirement_list):
+#     try:
+#         requirements = [
+#             requirement
+#             for requirement in requirement_list
+#             if should_install_requirement(requirement)
+#         ]
+#         if len(requirements) > 0:
+#             subprocess.check_call([sys.executable, "-m", "pip", "install", *requirements])
+#         else:
+#             print("Requirements already satisfied.")
 
-    except Exception as e:
-        print(e)
+#     except Exception as e:
+#         print(e)
 
-requirement_list = ['selenium', 'webdriver_manager', 'wget']
-install_packages(requirement_list)
-
-# import sys
-# import subprocess
-# import pkg_resources
-# import re
-# import yaml
-
-# def install_required_packages():
-#     required  = {'selenium', 'wget'} 
-#     installed = {pkg.key for pkg in pkg_resources.working_set}
-#     missing = required - installed
-
-#     if missing:
-#         print('installing', missing)
-#         subprocess.check_call([sys.executable, '-m', 'pip', 'install', *missing])
+# requirement_list = ['selenium', 'webdriver_manager', 'wget']
+# install_packages(requirement_list)
 
 # def download_chromedriver():
 #     import os
@@ -128,9 +125,3 @@ install_packages(requirement_list)
 #     #         version_number = get_latestversion(version)
 #     #         download_url = "https://chromedriver.storage.googleapis.com/" + version_number +"/chromedriver_linux64.zip"
 #     #         download(download_url, './temp/chromedriver', target_name)
-
-
-# if __name__ == '__main__':
-
-#     install_required_packages()
-#     # download_chromedriver()
