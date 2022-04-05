@@ -1,9 +1,10 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.common.exceptions import NoSuchElementException
 from webdriver_manager.chrome import ChromeDriverManager
-import yaml
-import os
+import yaml, os, time
 
 class LAN:
 
@@ -15,10 +16,10 @@ class LAN:
       self.passwordXpath = '//*[@id=\"loginbox\"]/table/tbody/tr[3]/td[2]/input'
       self.submit_buttonXpath = '//*[@id=\"loginbox\"]/table/tbody/tr[5]/td/center/input'
 
-      root = os.path.join(os.path.abspath(__file__), os.pardir, os.pardir)
+      self.root = os.path.join(os.path.abspath(__file__), os.pardir, os.pardir)
 
-      self.browser_details_path = os.path.join(root, r'config\browser_details.yml')
-      self.login_details_path = os.path.join(root, r'config\login_details.yml')
+      self.browser_details_path = os.path.join(self.root, r'config\browser_details.yml')
+      self.login_details_path = os.path.join(self.root, r'config\login_details.yml')
 
       self.username, self.password = self.getLoginDetails()
       self.driver = self.getWebDriver()
@@ -37,6 +38,8 @@ class LAN:
       option.add_experimental_option("excludeSwitches", ["enable-logging"])
 
       return (webdriver.Chrome(service = Service(ChromeDriverManager().install()), options = option))
+      # return (webdriver.Chrome(executable_path = os.path.join(self.root, 'chromedriver', 'chromedriver.exe'), options = option))
+
 
    def getBrowserPath(self):
       browser_path = r'C:\Program Files{}\{}\Application\{}.exe'
@@ -66,16 +69,27 @@ class LAN:
 
    def login(self):
       try:
+         print('Trying logging into LAN...')
+         print('Opening login URL...')
          self.driver.get(self.loginSiteUrl)
 
-         self.driver.find_element(by = By.XPATH, value = self.usernameXpath).send_keys(self.username)
-         self.driver.find_element(by = By.XPATH, value = self.passwordXpath).send_keys(self.password)
-         self.driver.find_element(by = By.XPATH, value = self.submit_buttonXpath).click()
+         self.driver.find_element(By.XPATH, self.usernameXpath).send_keys(self.username)
+         self.driver.find_element(By.XPATH, self.passwordXpath).send_keys(self.password)
+         print('Entered username and password...')
+         
+         self.driver.find_element(By.XPATH, self.submit_buttonXpath).click()
+         print('You\'re logged in now!')
 
       except Exception as e:
          self.driver.quit()
+         if isinstance(e, NoSuchElementException):
+            print('You\'re already logged in!')
+         else:
+            print('Exception occurred!', e)
+      
+      time.sleep(0.5)
 
 if __name__ == '__main__':
-   print('Logging into LAN...')
+   
    LAN().login()
-   print('Done!')
+   

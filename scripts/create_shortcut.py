@@ -1,19 +1,31 @@
-import os, winshell
+import os, winshell, time
 from win32com.client import Dispatch
 
-desktop = winshell.desktop()
-path = os.path.join(desktop, "LAN Login.lnk")
+if __name__ == '__main__':
 
-if not os.path.exists(path):
-	print('Creating shortcut...')
+	desktop = winshell.desktop()
+	path1 = os.path.join(desktop, "LAN Login (Anaconda).lnk")
+	path2 = os.path.join(desktop, "LAN Login (Python).lnk")
 
-	wDir = os.path.join(os.path.abspath(__file__), os.pardir, os.pardir)
-	target = os.path.join(wDir, 'lan_login_anaconda.bat')
+	if not os.path.exists(path1) and not os.path.exists(path2):
+		print('Creating shortcuts...')
 
-	shell = Dispatch('WScript.Shell')
-	shortcut = shell.CreateShortCut(path)
-	shortcut.Targetpath = target
-	shortcut.WorkingDirectory = wDir
-	shortcut.save()
+		wDir = os.path.join(os.path.abspath(__file__), os.pardir, os.pardir)
+		target1 = os.path.join(wDir, 'lan_login_anaconda.bat')
+		target2 = os.path.join(wDir, 'lan_login_python.bat')
 
-	print('Done')
+		shell = Dispatch('WScript.Shell')
+
+		shortcut = shell.CreateShortCut(path1)
+		shortcut.Targetpath = target1
+		shortcut.WorkingDirectory = wDir
+		shortcut.save()
+
+		shortcut = shell.CreateShortCut(path2)
+		shortcut.Targetpath = target2
+		shortcut.WorkingDirectory = wDir
+		shortcut.save()
+
+		print('Done')
+
+		time.sleep(1)
