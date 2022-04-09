@@ -4,8 +4,8 @@ from win32com.client import Dispatch
 if __name__ == '__main__':
 
 	desktop = winshell.desktop()
-	path1 = os.path.join(desktop, "LAN Login (Anaconda).lnk")
-	path2 = os.path.join(desktop, "LAN Login (Python).lnk")
+	path1 = os.path.join(desktop, 'LAN Login (Anaconda).lnk')
+	path2 = os.path.join(desktop, 'LAN Login (Python).lnk')
 
 	if not os.path.exists(path1) and not os.path.exists(path2):
 		print('Creating shortcuts...')
@@ -27,5 +27,7 @@ if __name__ == '__main__':
 		shortcut.save()
 
 		print('Done')
+		time.sleep(0.5)
 
-		time.sleep(1)
+	else:
+		print('Shortcuts already exist!\nDelete them to create new ones...')

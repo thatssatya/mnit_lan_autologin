@@ -15,3 +15,4 @@
 2. Run **setup_with_anaconda.bat**
 
 **Platforms supported:** Windows (x86, x64)
+**Browsers supported:** Google Chrome, Brave, Microsoft Edge
