@@ -1,10 +1,9 @@
 import sys
 import subprocess
 import pkg_resources
-# from pkg_resources import DistributionNotFound, VersionConflict
 
 def install_required_packages():
-    required  = {'selenium', 'webdriver_manager', 'winshell'} 
+    required  = {'selenium', 'webdriver_manager', 'winshell', 'pyyaml', 'pypiwin32'} 
     installed = {pkg.key for pkg in pkg_resources.working_set}
     missing = required - installed
 
@@ -15,32 +14,21 @@ def install_required_packages():
 if __name__ == '__main__':
     install_required_packages()
 
-# def should_install_requirement(requirement):
-#     should_install = False
-#     try:
-#         pkg_resources.require(requirement)
-#     except (DistributionNotFound, VersionConflict):
-#         should_install = True
-#     return should_install
 
 
-# def install_packages(requirement_list):
-#     try:
-#         requirements = [
-#             requirement
-#             for requirement in requirement_list
-#             if should_install_requirement(requirement)
-#         ]
-#         if len(requirements) > 0:
-#             subprocess.check_call([sys.executable, "-m", "pip", "install", *requirements])
-#         else:
-#             print("Requirements already satisfied.")
 
-#     except Exception as e:
-#         print(e)
 
-# requirement_list = ['selenium', 'webdriver_manager', 'wget']
-# install_packages(requirement_list)
+
+
+
+
+
+
+
+
+
+
+
 
 # def download_chromedriver():
 #     import os
@@ -72,7 +60,8 @@ if __name__ == '__main__':
 #             'brave': r'BraveSoftware\Brave-Browser'
 #         }
 
-#         browser_details = yaml.load(open(os.path.join(os.path.abspath(__file__), os.pardir, os.pardir, r'config\browser_details.yml')), Loader = yaml.BaseLoader)
+#         browser_details = yaml.load(open(os.path.join(os.path.abspath(__file__), os.pardir, os.pardir, \
+#           r'config\browser_details.yml')), Loader = yaml.BaseLoader)
 #         browser_name = (browser_details['browser']['name']).lower()
 
 #         if browser_name not in browser_folder:
